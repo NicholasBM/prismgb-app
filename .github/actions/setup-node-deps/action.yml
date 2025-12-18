@@ -1,0 +1,67 @@
+name: Setup Node and Dependencies
+description: Common setup for Node.js with platform-specific dependencies
+
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: '22'
+  skip-native-deps:
+    description: Skip native dependency installation
+    required: false
+    default: 'false'
+  install-xvfb:
+    description: Install xvfb for headless display (Linux only)
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Check for no-cache label
+      id: check-label
+      shell: bash
+      run: |
+        echo "skip_cache=${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'no-cache') }}" >> $GITHUB_OUTPUT
+        if [ "${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'no-cache') }}" = "true" ]; then
+          echo "::notice::Skipping cache due to 'no-cache' label"
+        fi
+
+    - name: Restore node_modules cache
+      id: cache-node-modules
+      if: steps.check-label.outputs.skip_cache != 'true'
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: node_modules
+        key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ inputs.node-version }}-${{ hashFiles('package-lock.json') }}
+
+    - name: Install Linux dependencies
+      if: runner.os == 'Linux' && inputs.skip-native-deps != 'true'
+      shell: bash
+      run: |
+        sudo apt-get update
+        deps="libusb-1.0-0-dev libudev-dev"
+        if [ "${{ inputs.install-xvfb }}" = "true" ]; then
+          deps="$deps xvfb"
+        fi
+        sudo apt-get install -y $deps
+
+    - name: Install macOS dependencies
+      if: runner.os == 'macOS' && inputs.skip-native-deps != 'true'
+      shell: bash
+      run: brew install libusb python-setuptools
+
+    - name: Install npm dependencies
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        if [ "${{ inputs.skip-native-deps }}" = "true" ]; then
+          npm ci --ignore-scripts
+        else
+          npm ci
+        fi

@@ -1,0 +1,13 @@
+#!/bin/sh
+# Custom xinitrc for PrismGB kiosk mode
+
+# Disable screen blanking and power management
+xset s off
+xset -dpms
+xset s noblank
+
+# Hide cursor
+unclutter -idle 0.1 -root &
+
+# Start window manager
+exec openbox-session

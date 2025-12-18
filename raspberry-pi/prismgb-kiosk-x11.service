@@ -1,0 +1,27 @@
+[Unit]
+Description=PrismGB Kiosk Mode (X11)
+After=multi-user.target
+Wants=multi-user.target
+
+[Service]
+Type=forking
+User=pi
+Group=pi
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+Environment=PRISMGB_DISABLE_GPU=0
+Environment=ELECTRON_DISABLE_SANDBOX=1
+WorkingDirectory=/home/pi
+ExecStartPre=/bin/sleep 5
+ExecStartPre=/usr/bin/startx /etc/X11/xinit/xinitrc -- :0 vt1 -nocursor
+ExecStart=/usr/bin/prismgb --no-sandbox --kiosk --disable-dev-shm-usage
+ExecStartPost=/usr/bin/unclutter -idle 0.1 -root &
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+KillMode=mixed
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

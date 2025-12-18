@@ -1,0 +1,28 @@
+[Unit]
+Description=PrismGB Kiosk Mode (Wayland)
+After=multi-user.target
+Wants=multi-user.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=XDG_SESSION_TYPE=wayland
+Environment=WAYLAND_DISPLAY=wayland-0
+Environment=PRISMGB_DISABLE_GPU=0
+Environment=ELECTRON_DISABLE_SANDBOX=1
+WorkingDirectory=/home/pi
+ExecStartPre=/bin/sleep 5
+ExecStartPre=/bin/mkdir -p /run/user/1000
+ExecStartPre=/bin/chown pi:pi /run/user/1000
+ExecStart=/usr/bin/cage -s -- /usr/bin/prismgb --no-sandbox --kiosk --disable-dev-shm-usage
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+KillMode=mixed
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

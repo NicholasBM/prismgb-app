@@ -29,8 +29,19 @@ jobs:
         export npm_config_target_arch=arm64
         export npm_config_arch=arm64
         export npm_config_target_platform=linux
+        
+        # Create temporary config to skip native rebuilding
+        cat > electron-builder-ci.json << 'EOF'
+        {
+          "extends": "./package.json",
+          "npmRebuild": false,
+          "nodeGypRebuild": false,
+          "buildDependenciesFromSource": false
+        }
+        EOF
+        
         npx vite build
-        npx electron-builder --linux --arm64 --config.npmRebuild=false
+        npx electron-builder --linux --arm64 --config electron-builder-ci.json
     
     - name: Upload ARM64 artifacts
       uses: actions/upload-artifact@v4

@@ -19,29 +19,31 @@ jobs:
         node-version: '22.12'
         cache: 'npm'
     
-    - name: Install dependencies
-      run: npm ci
+    - name: Install dependencies without optional deps
+      run: |
+        npm ci --omit=optional
+        # Remove problematic native modules
+        npm uninstall usb-detection || true
+        npm uninstall sharp || true
     
     - name: Build ARM64 package
       run: |
+        set -e
+        echo "=== Environment ==="
+        node --version
+        npm --version
+        echo "=== Building Vite ==="
         export ROLLUP_NO_NATIVE=1
         export ESBUILD_BINARY_PATH=""
-        export npm_config_target_arch=arm64
-        export npm_config_arch=arm64
-        export npm_config_target_platform=linux
-        
-        # Create temporary config to skip native rebuilding
-        cat > electron-builder-ci.json << 'EOF'
-        {
-          "extends": "./package.json",
-          "npmRebuild": false,
-          "nodeGypRebuild": false,
-          "buildDependenciesFromSource": false
-        }
-        EOF
-        
         npx vite build
-        npx electron-builder --linux --arm64 --config electron-builder-ci.json
+        echo "=== Vite build complete ==="
+        
+        echo "=== Building Electron package ==="
+        npx electron-builder --linux --arm64 --publish=never
+        echo "=== Build complete ==="
+        
+        echo "=== Listing output ==="
+        ls -la dist/ || echo "No dist directory"
     
     - name: Upload ARM64 artifacts
       uses: actions/upload-artifact@v4

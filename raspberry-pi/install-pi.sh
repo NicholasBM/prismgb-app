@@ -1,27 +1,18 @@
 #!/bin/bash
 
 # One-click PrismGB installer for Raspberry Pi Zero 2 W
-# Simple, reliable, works every time
+# Downloads and installs the complete package
 
 set -e
 
-PRISMGB_VERSION="1.1.0"
+VERSION="1.1.5"
 GITHUB_REPO="NicholasBM/prismgb-app"
+PACKAGE_NAME="prismgb-pi-installer.tar.gz"
 
 echo "========================================="
 echo "🎮 PrismGB Raspberry Pi Installer"
 echo "========================================="
 echo ""
-
-# Check if running on Pi
-if [ ! -f /proc/device-tree/model ] || ! grep -q "Raspberry Pi" /proc/device-tree/model; then
-    echo "⚠️  This script is designed for Raspberry Pi"
-    read -p "Continue anyway? [y/N]: " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 0
-    fi
-fi
 
 # Check if running as root
 if [ "$EUID" -eq 0 ]; then
@@ -34,43 +25,36 @@ echo "📡 Updating system..."
 sudo apt update
 
 echo "📦 Installing dependencies..."
-sudo apt install -y wget curl libusb-1.0-0 libudev1
+sudo apt install -y wget curl
 
-echo "⬇️  Downloading PrismGB ARM64..."
-DEB_FILE="PrismGB-${PRISMGB_VERSION}-arm64.deb"
-DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${PRISMGB_VERSION}/${DEB_FILE}"
+echo "⬇️  Downloading PrismGB installer package..."
+DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION}/${PACKAGE_NAME}"
 
 # Download with progress bar
-wget --progress=bar:force:noscroll "$DOWNLOAD_URL" -O "$DEB_FILE"
+wget --progress=bar:force:noscroll "$DOWNLOAD_URL" -O "$PACKAGE_NAME"
 
 echo "📦 Installing PrismGB..."
-sudo dpkg -i "$DEB_FILE" || sudo apt-get install -f -y
+tar -xzf "$PACKAGE_NAME"
+sudo cp -r prismgb-pi-installer/* /
 
-echo "🎯 Setting up kiosk mode..."
+echo "🔧 Setting up services..."
+sudo systemctl daemon-reload
+sudo systemctl enable prismgb-kiosk.service
 
-# Install minimal display server
-sudo apt install -y cage
+# Install Electron if not present
+if ! command -v electron &> /dev/null; then
+    echo "📦 Installing Electron..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+    sudo apt-get update
+    sudo apt-get install -y nodejs
+    sudo npm install -g electron
+fi
 
-# Create systemd service
-sudo tee /etc/systemd/system/prismgb-kiosk.service > /dev/null <<'EOF'
-[Unit]
-Description=PrismGB Kiosk Mode
-After=multi-user.target
-
-[Service]
-Type=simple
-User=pi
-Environment=XDG_RUNTIME_DIR=/run/user/1000
-ExecStartPre=/bin/sleep 3
-ExecStart=/usr/bin/cage -s -- /usr/bin/prismgb --no-sandbox --kiosk
-Restart=always
-RestartSec=5
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
-EOF
+# Install cage if not present
+if ! command -v cage &> /dev/null; then
+    echo "📦 Installing cage..."
+    sudo apt-get install -y cage
+fi
 
 # Configure auto-login
 sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
@@ -80,24 +64,20 @@ ExecStart=
 ExecStart=-/sbin/agetty --autologin pi --noclear %I \$TERM
 EOF
 
-# USB permissions for Chromatic
-sudo tee /etc/udev/rules.d/99-chromatic.rules > /dev/null <<'EOF'
-SUBSYSTEM=="usb", ATTR{idVendor}=="374e", ATTR{idProduct}=="0101", MODE="0666", GROUP="plugdev"
-EOF
-
+# Reload udev rules
 sudo udevadm control --reload-rules
-
-# Enable services
-sudo systemctl daemon-reload
-sudo systemctl enable prismgb-kiosk.service
+sudo udevadm trigger
 
 # Cleanup
-rm -f "$DEB_FILE"
+rm -rf "$PACKAGE_NAME" prismgb-pi-installer/
 
 echo ""
 echo "✅ Installation complete!"
 echo ""
-echo "🔄 Reboot to start PrismGB automatically:"
+echo "🔄 To start PrismGB kiosk mode:"
+echo "   sudo systemctl start prismgb-kiosk"
+echo ""
+echo "🔄 Or reboot to start automatically:"
 echo "   sudo reboot"
 echo ""
 echo "🛠️  Useful commands:"
@@ -106,8 +86,9 @@ echo "   sudo systemctl stop prismgb-kiosk      # Stop kiosk"
 echo "   journalctl -u prismgb-kiosk -f         # View logs"
 echo ""
 
-read -p "Reboot now? [Y/n]: " -n 1 -r
+read -p "Start PrismGB kiosk mode now? [Y/n]: " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-    sudo reboot
+    sudo systemctl start prismgb-kiosk
+    echo "🎮 PrismGB is starting in kiosk mode!"
 fi

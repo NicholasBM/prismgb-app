@@ -58,6 +58,15 @@ echo "📁 Installing PrismGB files..."
 sudo cp -r prismgb-pi-installer/opt /
 sudo cp -r prismgb-pi-installer/etc /
 
+# Fix missing assets issue
+echo "🔧 Fixing missing assets..."
+sudo mkdir -p /opt/prismgb/main/assets
+sudo cp /opt/prismgb/renderer/assets/tray-icon.png /opt/prismgb/main/assets/ 2>/dev/null || echo "Tray icon already exists"
+
+# Fix Electron sandbox issue for root execution
+echo "🔧 Fixing Electron sandbox for root execution..."
+sudo sed -i 's|exec electron dist/main/index.js|exec electron --no-sandbox main/index.js|g' /opt/prismgb/prismgb
+
 # Clean up
 echo "🧹 Cleaning up..."
 if [ -n "$WORK_DIR" ]; then

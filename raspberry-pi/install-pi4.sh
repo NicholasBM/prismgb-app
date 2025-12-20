@@ -179,8 +179,8 @@ module.exports = {
   stopMonitoring: () => detector.stopMonitoring()
 };
 EOF
-EOF# Fi
-x WindowManager for production mode
+
+# Fix WindowManager for production mode
 echo "🔧 Fixing WindowManager for production mode..."
 sudo cp /opt/prismgb/main/WindowManager-Ms3H4scH.js /opt/prismgb/main/WindowManager-Ms3H4scH.js.backup
 sudo sed -i 's|this.mainWindow.loadURL("http://localhost:3000/src/app/renderer/index.html")|this.mainWindow.loadFile(i.join(f, "../renderer/src/app/renderer/index.html"))|g' /opt/prismgb/main/WindowManager-Ms3H4scH.js

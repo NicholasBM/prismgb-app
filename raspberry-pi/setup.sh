@@ -80,6 +80,9 @@ else
         echo "Downloading source package..."
         wget "$SOURCE_URL"
         
+        echo "Installing build dependencies..."
+        sudo apt install -y git nodejs npm python3 build-essential libusb-1.0-0-dev libudev-dev
+        
         echo "Extracting source package..."
         tar -xzf "$SOURCE_PACKAGE"
         SOURCE_DIR="prismgb-source-${PRISMGB_VERSION}"

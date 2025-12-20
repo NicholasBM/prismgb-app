@@ -20,7 +20,7 @@ fi
 
 echo "Step 1: Installing build dependencies..."
 sudo apt update
-sudo apt install -y git nodejs npm python3 build-essential libusb-1.0-0-dev
+sudo apt install -y git nodejs npm python3 build-essential libusb-1.0-0-dev libudev-dev
 
 echo ""
 echo "Step 2: Checking Node.js version..."

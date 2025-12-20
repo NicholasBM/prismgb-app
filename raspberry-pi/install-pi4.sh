@@ -24,14 +24,48 @@ sudo npm install -g electron
 
 # Download and extract PrismGB
 echo "📥 Downloading PrismGB..."
-cd /tmp
+
+# Check /tmp space and use home directory if needed
+TMP_AVAIL=$(df /tmp | tail -1 | awk '{print $4}')
+if [ "$TMP_AVAIL" -lt 1000000 ]; then
+    echo "⚠️  /tmp has limited space, using home directory..."
+    WORK_DIR="$HOME/prismgb-install"
+    mkdir -p "$WORK_DIR"
+    cd "$WORK_DIR"
+else
+    cd /tmp
+fi
+
 wget -O prismgb-pi-installer.tar.gz "https://github.com/NicholasBM/prismgb-pi/releases/download/v1.1.5/prismgb-pi-installer.tar.gz"
+
+# Check if download was successful
+if [ ! -f prismgb-pi-installer.tar.gz ]; then
+    echo "❌ Download failed!"
+    exit 1
+fi
+
+echo "📦 Extracting package..."
 tar -xzf prismgb-pi-installer.tar.gz
+
+# Check if extraction was successful
+if [ ! -d prismgb-pi-installer ]; then
+    echo "❌ Extraction failed!"
+    exit 1
+fi
 
 # Install PrismGB files
 echo "📁 Installing PrismGB files..."
 sudo cp -r prismgb-pi-installer/opt /
 sudo cp -r prismgb-pi-installer/etc /
+
+# Clean up
+echo "🧹 Cleaning up..."
+if [ -n "$WORK_DIR" ]; then
+    cd "$HOME"
+    rm -rf "$WORK_DIR"
+else
+    rm -rf /tmp/prismgb-pi-installer*
+fi
 
 # Apply all our fixes and optimizations
 echo "🔧 Applying fixes and optimizations..."

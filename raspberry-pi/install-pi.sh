@@ -30,12 +30,44 @@ sudo apt install -y wget curl
 echo "⬇️  Downloading PrismGB installer package..."
 DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION}/${PACKAGE_NAME}"
 
+# Check available space and choose appropriate directory
+TMP_AVAIL=$(df /tmp 2>/dev/null | tail -1 | awk '{print $4}' || echo "0")
+if [ "$TMP_AVAIL" -lt 1000000 ]; then
+    echo "⚠️  /tmp has limited space, using home directory..."
+    WORK_DIR="$HOME/prismgb-install"
+    mkdir -p "$WORK_DIR"
+    cd "$WORK_DIR"
+fi
+
 # Download with progress bar
 wget --progress=bar:force:noscroll "$DOWNLOAD_URL" -O "$PACKAGE_NAME"
 
+# Check if download was successful
+if [ ! -f "$PACKAGE_NAME" ]; then
+    echo "❌ Download failed!"
+    exit 1
+fi
+
 echo "📦 Installing PrismGB..."
 tar -xzf "$PACKAGE_NAME"
+
+# Check if extraction was successful
+if [ ! -d prismgb-pi-installer ]; then
+    echo "❌ Extraction failed!"
+    exit 1
+fi
+
 sudo cp -r prismgb-pi-installer/* /
+
+# Clean up
+echo "🧹 Cleaning up..."
+if [ -n "$WORK_DIR" ]; then
+    cd "$HOME"
+    rm -rf "$WORK_DIR"
+else
+    rm -f "$PACKAGE_NAME"
+    rm -rf prismgb-pi-installer/
+fi
 
 echo "🔧 Setting up services..."
 sudo systemctl daemon-reload

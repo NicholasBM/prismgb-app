@@ -178,6 +178,7 @@ module.exports = {
   startMonitoring: () => detector.startMonitoring(),
   stopMonitoring: () => detector.stopMonitoring()
 };
+EOF
 EOF# Fi
 x WindowManager for production mode
 echo "🔧 Fixing WindowManager for production mode..."

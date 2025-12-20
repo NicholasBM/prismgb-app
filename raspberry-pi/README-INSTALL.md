@@ -5,7 +5,7 @@
 Run this single command on your Raspberry Pi Zero 2 W:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/NicholasBM/prismgb-app/main/raspberry-pi/install-pi.sh | bash
+curl -sSL https://raw.githubusercontent.com/NicholasBM/prismgb-pi/main/raspberry-pi/install-pi.sh | bash
 ```
 
 That's it! PrismGB will:

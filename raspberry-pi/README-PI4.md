@@ -8,7 +8,7 @@
 
 **For Raspberry Pi 4 (Recommended):**
 ```bash
-curl -sSL https://raw.githubusercontent.com/NicholasBM/prismgb-app/main/raspberry-pi/install-pi4.sh | bash
+curl -sSL https://raw.githubusercontent.com/NicholasBM/prismgb-pi/main/raspberry-pi/install-pi4.sh | bash
 sudo reboot
 ```
 
@@ -141,7 +141,7 @@ If you prefer to understand what the installer does:
 
 3. **Download PrismGB**:
    ```bash
-   wget -O /tmp/prismgb.tar.gz "https://github.com/NicholasBM/prismgb-app/releases/download/v1.1.5/prismgb-pi-installer.tar.gz"
+   wget -O /tmp/prismgb.tar.gz "https://github.com/NicholasBM/prismgb-pi/releases/download/v1.1.5/prismgb-pi-installer.tar.gz"
    cd /tmp && tar -xzf prismgb.tar.gz
    sudo cp -r prismgb-pi-installer/* /
    ```

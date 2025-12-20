@@ -25,7 +25,7 @@ sudo npm install -g electron
 # Download and extract PrismGB
 echo "📥 Downloading PrismGB..."
 cd /tmp
-wget -O prismgb-pi-installer.tar.gz "https://github.com/NicholasBM/prismgb-app/releases/download/v1.1.5/prismgb-pi-installer.tar.gz"
+wget -O prismgb-pi-installer.tar.gz "https://github.com/NicholasBM/prismgb-pi/releases/download/v1.1.5/prismgb-pi-installer.tar.gz"
 tar -xzf prismgb-pi-installer.tar.gz
 
 # Install PrismGB files

@@ -6,7 +6,7 @@
 set -e
 
 VERSION="1.1.5"
-GITHUB_REPO="NicholasBM/prismgb-app"
+GITHUB_REPO="NicholasBM/prismgb-pi"
 PACKAGE_NAME="prismgb-pi-installer.tar.gz"
 
 echo "========================================="

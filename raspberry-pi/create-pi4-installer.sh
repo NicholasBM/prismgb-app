@@ -42,7 +42,7 @@ sudo npm install -g electron
 # Download and extract PrismGB
 echo "📥 Downloading PrismGB..."
 cd /tmp
-wget -O prismgb-pi-installer.tar.gz "https://github.com/NicholasBM/prismgb-app/releases/download/v1.1.5/prismgb-pi-installer.tar.gz"
+wget -O prismgb-pi-installer.tar.gz "https://github.com/NicholasBM/prismgb-pi/releases/download/v1.1.5/prismgb-pi-installer.tar.gz"
 tar -xzf prismgb-pi-installer.tar.gz
 
 # Install PrismGB files
@@ -274,7 +274,7 @@ This installer includes all fixes, optimizations, and lessons learned from the d
 2. **Boot Pi 4 and connect to internet**
 3. **Run the installer**:
    ```bash
-   curl -sSL https://raw.githubusercontent.com/NicholasBM/prismgb-app/main/raspberry-pi/install-pi4.sh | bash
+   curl -sSL https://raw.githubusercontent.com/NicholasBM/prismgb-pi/main/raspberry-pi/install-pi4.sh | bash
    ```
 4. **Reboot**: `sudo reboot`
 
@@ -333,5 +333,5 @@ echo "📦 Package: prismgb-pi4-installer.tar.gz"
 echo "🚀 Ready to upload to GitHub releases"
 echo ""
 echo "Users can install with:"
-echo "curl -sSL https://raw.githubusercontent.com/NicholasBM/prismgb-app/main/raspberry-pi/install-pi4.sh | bash"
+echo "curl -sSL https://raw.githubusercontent.com/NicholasBM/prismgb-pi/main/raspberry-pi/install-pi4.sh | bash"
 echo ""

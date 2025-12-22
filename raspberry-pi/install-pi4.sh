@@ -113,25 +113,27 @@ AUTOEOF
 
 sudo chmod +x /opt/prismgb/auto-click-on-device.sh
 
-# Create auto-click systemd service
+# Create auto-click systemd service with better dependencies
 sudo tee /etc/systemd/system/prismgb-autoclick.service > /dev/null << 'AUTOSVCEOF'
 [Unit]
 Description=PrismGB Auto-Click on Device Connection
-After=prismgb-direct.service graphical.target
-Requires=prismgb-direct.service
-Wants=graphical.target
+After=prismgb-direct.service multi-user.target
+Wants=prismgb-direct.service
+BindsTo=prismgb-direct.service
 
 [Service]
 Type=simple
 User=root
 Environment=DISPLAY=:0
-ExecStartPre=/bin/sleep 10
+Environment=XAUTHORITY=/home/pi/.Xauthority
+ExecStartPre=/bin/sleep 30
 ExecStart=/opt/prismgb/auto-click-on-device.sh
 Restart=always
-RestartSec=5
+RestartSec=15
+TimeoutStartSec=180
 
 [Install]
-WantedBy=graphical.target
+WantedBy=multi-user.target
 AUTOSVCEOF
 
 # Clean up
@@ -311,10 +313,29 @@ RestartSec=5
 WantedBy=multi-user.target
 SERVICEEOF
 
-# Enable the service
+# Enable and start the services
 sudo systemctl daemon-reload
 sudo systemctl enable prismgb-direct
 sudo systemctl enable prismgb-autoclick
+
+# Start the auto-click service immediately (don't wait for reboot)
+echo "🎮 Starting auto-click service..."
+sudo systemctl start prismgb-autoclick
+
+# Verify services are working
+echo "✅ Checking service status..."
+if sudo systemctl is-active --quiet prismgb-direct; then
+    echo "✅ PrismGB service is running"
+else
+    echo "⚠️  PrismGB service not running - will start on reboot"
+fi
+
+if sudo systemctl is-active --quiet prismgb-autoclick; then
+    echo "✅ Auto-click service is running"
+else
+    echo "⚠️  Auto-click service failed to start"
+    echo "   Run: sudo systemctl start prismgb-autoclick"
+fi
 
 # Pi 4 optimizations
 echo "⚡ Applying Pi 4 optimizations..."
@@ -341,7 +362,14 @@ echo "✅ Auto-fullscreen when device connected"
 echo "✅ Auto-clicks when Chromatic connected"
 echo "✅ USB detection working"
 echo "✅ Forced 1080p for optimal performance"
+echo "✅ Services configured and started"
 echo "✅ Ready for Chromatic - just plug and play!"
 echo ""
-echo "🔄 Reboot now to start PrismGB: sudo reboot"
+echo "📋 Service Status:"
+sudo systemctl is-active prismgb-direct && echo "  ✅ PrismGB: Running" || echo "  ⏳ PrismGB: Will start on reboot"
+sudo systemctl is-active prismgb-autoclick && echo "  ✅ Auto-click: Running" || echo "  ⚠️  Auto-click: Check with 'sudo systemctl start prismgb-autoclick'"
+echo ""
+echo "🔄 Reboot now to ensure everything starts properly: sudo reboot"
+echo ""
+echo "🎮 After reboot: Just connect your Chromatic and it will auto-connect!"
 echo ""

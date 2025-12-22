@@ -1,227 +1,87 @@
-# PrismGB
-
-<p align="center">
-  <img src="assets/Logo.png" alt="PrismGB Logo" width="400">
-</p>
-
-<p align="center">
-  <strong>A desktop streaming and capture application for the Mod Retro Chromatic</strong>
-</p>
-
-<p align="center">
-  <a href="https://github.com/josstei/prismgb-app/releases/latest"><img src="https://img.shields.io/github/v/release/josstei/prismgb-app?label=version" alt="Latest Release"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
-  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" alt="Platform">
-</p>
-
-<p align="center">
-  <a href="#installation">Installation</a> •
-  <a href="#features">Features</a> •
-  <a href="#usage">Usage</a> •
-  <a href="#troubleshooting">Troubleshooting</a> •
-  <a href="#license">License</a>
-</p>
+<p align="center"> <img src="https://github.com/NicholasBM/prismgb-pi/blob/main/prismgbpi.png" alt="PrismGB-Pi Logo" width="400"> </p>
 
 ---
 
-> **DISCLAIMER**
->
-> This is an **unofficial**, community-developed application.
->
-> PrismGB is not affiliated with, endorsed by, or sponsored by [Mod Retro](https://modretro.com).
-> The Chromatic is a product of Mod Retro.
->
-> For official Chromatic support and information, please visit [modretro.com](https://modretro.com).
+## PrismGB-Pi (Raspberry Pi TV Dock)
+
+PrismGB-Pi is a lightweight, always-on TV dock for the Mod Retro Chromatic built on top of PrismGB and designed to run on a Raspberry Pi.
+
+Big credit goes to the original PrismGB developer for creating the desktop application. PrismGB-Pi does not replace or fork the core project. Instead, it provides a simple, repeatable way to run PrismGB on ARM hardware, effectively turning a Raspberry Pi into a dedicated Chromatic TV dock.
+
+This setup is ideal if you want a small, silent box connected to your TV that boots straight into PrismGB and is always ready to display your Chromatic. Raspberry Pi 4 is recommended.
+
+### What PrismGB-Pi Does
+
+PrismGB-Pi adapts the existing PrismGB desktop application to run cleanly on Raspberry Pi (ARM) and behave like a console-style dock rather than a general-purpose desktop app.
+
+Once installed:
+
+* The Pi boots directly into PrismGB
+* PrismGB launches automatically in fullscreen
+* No keyboard or mouse is required after setup
+* The system waits idle until a Chromatic is connected
+* Powering the Pi on or off effectively turns the dock on or off
+
+### Hardware Required
+
+* Raspberry Pi (Pi 4 recommended)
+* SD card
+* USB-C power supply
+* Micro HDMI adapter
+* HDMI cable
+* Mod Retro Chromatic
+
+### Raspberry Pi Setup Instructions
+
+First, create a new OS image on your SD card using the Raspberry Pi Imager, available for macOS and Windows.
+
+In the Raspberry Pi Imager:
+
+* Select OS
+* Choose “Other”
+* Select “Raspberry Pi OS Lite”
+* Enable SSH
+* Set a username and password
+* Add your Wi-Fi details
+* Write the image to the SD card
+
+Insert the SD card into the Raspberry Pi and power it on. After roughly ten seconds, the Pi should be available on your network.
+
+SSH into the Pi using:
+ssh pi@<local-ip-address>
+
+You can find the IP address using a device scanning app or your router’s admin page. Enter your password when prompted.
+
+Once logged in, run the following command:
+
+curl -sSL [https://raw.githubusercontent.com/NicholasBM/prismgb-pi/main/raspberry-pi/install-pi4.sh](https://raw.githubusercontent.com/NicholasBM/prismgb-pi/main/raspberry-pi/install-pi4.sh) | bash
+
+This script installs PrismGB along with all required ARM-compatible dependencies for the Raspberry Pi. Most dependencies are prepackaged to avoid timeouts or failed network requests during installation.
+
+The installation typically takes around ten minutes depending on network speed.
+
+When the script completes, reboot the system:
+
+sudo reboot
+
+### Usage
+
+After reboot, the Raspberry Pi will boot directly into PrismGB-Pi.
+
+From this point on:
+
+* The system automatically launches PrismGB in fullscreen
+* No desktop environment is shown
+* The application waits for a Mod Retro Chromatic to connect
+* Once connected, gameplay is displayed on your TV
+
+Powering the Raspberry Pi on and off is all that’s needed to use the dock, giving a simple, console-like experience with full retro glory on the big screen.
 
 ---
 
-PrismGB is a free, open-source desktop application that lets you stream and capture video from your [Mod Retro Chromatic](https://modretro.com) handheld gaming device. Connect your Chromatic via USB and enjoy your gameplay on a larger screen, take screenshots, or record your gaming sessions.
+If you want, next I can:
 
-## Features
-
-- **Live Video Streaming** - Stream your Chromatic's display to your desktop in real-time
-- **Screenshot Capture** - Take instant screenshots of your gameplay
-- **Video Recording** - Record your gaming sessions
-- **Render Presets** - Choose from visual styles: True Color, Vibrant, Hi-Def, Vintage (CRT), or Pixel
-- **Brightness Control** - Adjust display brightness to your preference
-- **Volume Control** - Adjust audio levels with an intuitive slider
-- **Cinematic Mode** - Distraction-free fullscreen viewing
-- **Fullscreen Support** - Expand to fullscreen for the best viewing experience
-- **System Tray Integration** - Runs quietly in your system tray
-- **Cross-Platform** - Available for Windows, macOS, and Linux
-
-## Requirements
-
-- A [Mod Retro Chromatic](https://modretro.com) device
-- USB connection to your computer
-- Windows 10+, macOS 10.15+, or Linux (Ubuntu 18.04+, Fedora, Arch, etc.)
-
-## Installation
-
-### Download Pre-built Releases
-
-Download the latest release for your operating system from the [Releases](https://github.com/josstei/prismgb-app/releases) page:
-
-| Platform | Download | Description |
-|----------|----------|-------------|
-| Windows  | `PrismGB-Setup-x.x.x.exe` | Installer with Start Menu shortcuts |
-| Windows  | `PrismGB-x.x.x-portable.exe` | Portable version, no install needed |
-| macOS (Apple Silicon) | `PrismGB-x.x.x-mac-arm64.dmg` | For M1/M2/M3/M4 Macs |
-| macOS (Intel) | `PrismGB-x.x.x-mac-x64.dmg` | For Intel-based Macs |
-| Linux    | `PrismGB-x.x.x-x86_64.AppImage` | Universal Linux package |
-| Linux    | `PrismGB-x.x.x-amd64.deb` | For Debian/Ubuntu systems |
-| Linux    | `PrismGB-x.x.x-x64.tar.gz` | Compressed archive |
-
-> **Note:** Replace `x.x.x` with the actual version number (e.g., `1.1.1`).
-
-### Windows Installation
-
-**Using the Installer (recommended):**
-1. Download `PrismGB-Setup-x.x.x.exe`
-2. Run the installer and follow the prompts
-3. Launch PrismGB from the Start Menu or desktop shortcut
-
-**Using the Portable Version:**
-1. Download `PrismGB-x.x.x-portable.exe`
-2. Run the executable directly - no installation required
-3. Great for USB drives or systems where you can't install software
-
-### macOS Installation
-
-1. Download the appropriate DMG for your Mac:
-   - **Apple Silicon (M1/M2/M3/M4):** `PrismGB-x.x.x-mac-arm64.dmg`
-   - **Intel:** `PrismGB-x.x.x-mac-x64.dmg`
-2. Open the DMG file
-3. Drag PrismGB to your Applications folder
-4. Launch PrismGB from your Applications folder or Spotlight
-
-> **Tip:** Not sure which Mac you have? Click the Apple menu → "About This Mac". If it says "Apple M1/M2/M3/M4", use the ARM64 version. If it says "Intel", use the x64 version.
-
-### Linux Installation
-
-**Option 1: AppImage (recommended for most users)**
-```bash
-# Make the AppImage executable
-chmod +x PrismGB-x.x.x-x86_64.AppImage
-
-# Run the application
-./PrismGB-x.x.x-x86_64.AppImage
-```
-> AppImages are self-contained and work on most Linux distributions without installation.
-
-**Option 2: Debian/Ubuntu (.deb)**
-```bash
-# Install the package (automatically installs libusb dependency)
-sudo dpkg -i PrismGB-x.x.x-amd64.deb
-
-# If there are dependency errors, run:
-sudo apt-get install -f
-```
-
-**Option 3: Tar Archive**
-```bash
-# Extract the archive
-tar -xzf PrismGB-x.x.x-x64.tar.gz
-
-# Run PrismGB from the extracted folder
-./PrismGB-x.x.x-x64/prismgb
-```
-
-**Required: USB Library**
-
-PrismGB requires `libusb` for USB device communication. Install it if not already present:
-
-```bash
-# Debian/Ubuntu
-sudo apt install libusb-1.0-0
-
-# Fedora
-sudo dnf install libusb
-
-# Arch Linux
-sudo pacman -S libusb
-```
-
-## Usage
-
-1. **Connect your Chromatic** to your computer via USB
-2. **Launch PrismGB**
-3. **Click the video area** to start streaming
-4. Use the control buttons to:
-   - Take a **screenshot**
-   - Start/stop **video recording**
-   - Adjust **volume**
-   - Enter **fullscreen** mode
-   - Toggle **cinematic mode** for a cleaner viewing experience
-
-### File Locations
-
-Screenshots and recordings are automatically saved to your **Downloads** folder:
-
-| Platform | Location |
-|----------|----------|
-| Windows  | `C:\Users\<username>\Downloads\` |
-| macOS    | `~/Downloads/` |
-| Linux    | `~/Downloads/` |
-
-- Screenshots: `PrismGB_Screenshot_YYYYMMDD_HHMMSS.png`
-- Recordings: `PrismGB_Recording_YYYYMMDD_HHMMSS.webm`
-
-## Troubleshooting
-
-### Device Not Detected
-
-1. Ensure your Chromatic is powered on and connected via USB
-2. Try a different USB port or cable
-3. On Linux, you may need to configure udev rules for USB access
-4. Restart the application after connecting the device
-
-### Video Not Displaying
-
-1. Click on the video area to initiate the stream
-2. Check that no other application is using the Chromatic's video feed
-3. Try disconnecting and reconnecting the device
-
-### Permission Issues (Linux)
-
-If you encounter USB permission errors, you have two options:
-
-**Option 1: Add user to plugdev group**
-```bash
-sudo usermod -a -G plugdev $USER
-```
-Log out and back in for changes to take effect.
-
-**Option 2: Create a udev rule (recommended)**
-
-Create a file `/etc/udev/rules.d/99-chromatic.rules` with this content:
-```bash
-# Mod Retro Chromatic
-SUBSYSTEM=="usb", ATTR{idVendor}=="374e", ATTR{idProduct}=="0101", MODE="0666"
-```
-
-Then reload udev rules:
-```bash
-sudo udevadm control --reload-rules
-sudo udevadm trigger
-```
-
-Reconnect your Chromatic after applying the rule.
-
-## Contributing
-
-Contributions are welcome! See [DEVELOPMENT.md](DEVELOPMENT.md) for build instructions and [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [Mod Retro](https://modretro.com) for creating the Chromatic handheld
-
-## Support
-
-If you find PrismGB useful, consider supporting its development:
-
-<a href="https://ko-fi.com/josstei"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support on Ko-fi"></a>
+* Tighten this further to match the tone of the rest of the README exactly
+* Split it into a separate PrismGB-Pi README
+* Add a short “Differences vs Desktop PrismGB” section
+* Adjust wording to be more formal or more hobbyist-friendly

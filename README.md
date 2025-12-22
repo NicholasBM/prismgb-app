@@ -76,12 +76,3 @@ From this point on:
 * Once connected, gameplay is displayed on your TV
 
 Powering the Raspberry Pi on and off is all that’s needed to use the dock, giving a simple, console-like experience with full retro glory on the big screen.
-
----
-
-If you want, next I can:
-
-* Tighten this further to match the tone of the rest of the README exactly
-* Split it into a separate PrismGB-Pi README
-* Add a short “Differences vs Desktop PrismGB” section
-* Adjust wording to be more formal or more hobbyist-friendly

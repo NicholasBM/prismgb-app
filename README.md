@@ -6,7 +6,7 @@
 
 PrismGB-Pi is a lightweight, always-on TV dock for the Mod Retro Chromatic built on top of PrismGB and designed to run on a Raspberry Pi.
 
-Big credit goes to the original PrismGB developer for creating the desktop application. PrismGB-Pi does not replace or fork the core project. Instead, it provides a simple, repeatable way to run PrismGB on ARM hardware, effectively turning a Raspberry Pi into a dedicated Chromatic TV dock.
+Big credit goes to the original PrismGB developer for creating the desktop application. PrismGB-Pi does not replace or fork the core project. Instead, it provides a simple, repeatable way to run PrismGB on ARM hardware, effectively turning a Raspberry Pi into a dedicated Chromatic TV dock. Source > https://github.com/josstei/prismgb-app
 
 This setup is ideal if you want a small, silent box connected to your TV that boots straight into PrismGB and is always ready to display your Chromatic. Raspberry Pi 4 is recommended.
 

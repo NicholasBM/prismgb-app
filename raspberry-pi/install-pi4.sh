@@ -67,6 +67,73 @@ sudo cp /opt/prismgb/renderer/assets/tray-icon.png /opt/prismgb/main/assets/ 2>/
 echo "🔧 Fixing Electron sandbox for root execution..."
 sudo sed -i 's|exec electron dist/main/index.js|exec electron --no-sandbox main/index.js|g' /opt/prismgb/prismgb
 
+# Create auto-click service for device detection
+echo "🎮 Setting up auto-click on device connection..."
+sudo tee /opt/prismgb/auto-click-on-device.sh > /dev/null << 'AUTOEOF'
+#!/bin/bash
+DISPLAY=:0
+export DISPLAY
+echo "Starting USB device monitor for auto-click and fullscreen..."
+
+auto_click_and_fullscreen() {
+    echo "Device connected! Making PrismGB fullscreen and auto-clicking..."
+    
+    # Get current screen resolution dynamically
+    RESOLUTION=$(DISPLAY=:0 xrandr | grep '*' | awk '{print $1}' | head -1)
+    WIDTH=$(echo $RESOLUTION | cut -d'x' -f1)
+    HEIGHT=$(echo $RESOLUTION | cut -d'x' -f2)
+    CENTER_X=$((WIDTH / 2))
+    CENTER_Y=$((HEIGHT / 2))
+    
+    # Make PrismGB fullscreen first
+    DISPLAY=:0 xdotool search --name "PrismGB" windowactivate windowsize $WIDTH $HEIGHT windowmove 0 0
+    sleep 1
+    
+    # Then click the center to connect
+    DISPLAY=:0 xdotool mousemove $CENTER_X $CENTER_Y
+    sleep 0.5
+    DISPLAY=:0 xdotool click 1
+    
+    echo "Made fullscreen ($WIDTH x $HEIGHT) and auto-clicked at $CENTER_X,$CENTER_Y"
+}
+
+previous_devices=$(lsusb)
+while true; do
+    sleep 2
+    current_devices=$(lsusb)
+    if [ "$current_devices" != "$previous_devices" ]; then
+        echo "USB device change detected"
+        if echo "$current_devices" | grep -q "374e\|1209\|046d\|2341"; then
+            auto_click_and_fullscreen
+        fi
+        previous_devices="$current_devices"
+    fi
+done
+AUTOEOF
+
+sudo chmod +x /opt/prismgb/auto-click-on-device.sh
+
+# Create auto-click systemd service
+sudo tee /etc/systemd/system/prismgb-autoclick.service > /dev/null << 'AUTOSVCEOF'
+[Unit]
+Description=PrismGB Auto-Click on Device Connection
+After=prismgb-direct.service graphical.target
+Requires=prismgb-direct.service
+Wants=graphical.target
+
+[Service]
+Type=simple
+User=root
+Environment=DISPLAY=:0
+ExecStartPre=/bin/sleep 10
+ExecStart=/opt/prismgb/auto-click-on-device.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=graphical.target
+AUTOSVCEOF
+
 # Clean up
 echo "🧹 Cleaning up..."
 if [ -n "$WORK_DIR" ]; then
@@ -217,11 +284,9 @@ export NODE_ENV=production
 cd /opt/prismgb
 ./prismgb &
 
-# Auto-fullscreen after 5 seconds
+# Auto-fullscreen after 5 seconds using the working method
 sleep 5
-DISPLAY=:0 xdotool search --name "PrismGB" windowactivate
-sleep 1
-DISPLAY=:0 xdotool key F11
+DISPLAY=:0 xdotool search --name "PrismGB" windowactivate windowsize 1920 1080 windowmove 0 0
 wait
 STARTEOF
 
@@ -249,21 +314,34 @@ SERVICEEOF
 # Enable the service
 sudo systemctl daemon-reload
 sudo systemctl enable prismgb-direct
+sudo systemctl enable prismgb-autoclick
 
 # Pi 4 optimizations
 echo "⚡ Applying Pi 4 optimizations..."
 echo 'gpu_mem=128' | sudo tee -a /boot/firmware/config.txt
 echo 'disable_overscan=1' | sudo tee -a /boot/firmware/config.txt
+
+# Aggressive 1080p forcing for better performance
+echo '# FORCE 1080p output (aggressive settings)' | sudo tee -a /boot/firmware/config.txt
+echo 'hdmi_ignore_edid=0xa5000080' | sudo tee -a /boot/firmware/config.txt
+echo 'hdmi_edid_file=1' | sudo tee -a /boot/firmware/config.txt
 echo 'hdmi_force_hotplug=1' | sudo tee -a /boot/firmware/config.txt
+echo 'hdmi_group=2' | sudo tee -a /boot/firmware/config.txt
+echo 'hdmi_mode=82' | sudo tee -a /boot/firmware/config.txt
+echo 'hdmi_drive=2' | sudo tee -a /boot/firmware/config.txt
+echo 'config_hdmi_boost=10' | sudo tee -a /boot/firmware/config.txt
+echo 'framebuffer_width=1920' | sudo tee -a /boot/firmware/config.txt
+echo 'framebuffer_height=1080' | sudo tee -a /boot/firmware/config.txt
 
 echo ""
 echo "🎉 PrismGB Pi 4 installation complete!"
 echo ""
 echo "✅ Auto-boots to PrismGB on TV"
-echo "✅ Auto-fullscreen in 5 seconds"  
+echo "✅ Auto-fullscreen when device connected"  
+echo "✅ Auto-clicks when Chromatic connected"
 echo "✅ USB detection working"
-echo "✅ Optimized for Pi 4"
-echo "✅ Ready for Chromatic"
+echo "✅ Forced 1080p for optimal performance"
+echo "✅ Ready for Chromatic - just plug and play!"
 echo ""
 echo "🔄 Reboot now to start PrismGB: sudo reboot"
 echo ""

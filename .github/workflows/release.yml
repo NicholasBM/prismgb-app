@@ -307,7 +307,7 @@ jobs:
           fi
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.2.1
+        uses: softprops/action-gh-release@5122b4edc95f85501a71628a57dc180a03ec7588 # v2.2.1
         with:
           tag_name: ${{ needs.check-release.outputs.tag }}
           name: v${{ needs.check-release.outputs.version }}

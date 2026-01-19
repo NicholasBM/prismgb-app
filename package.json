@@ -45,8 +45,8 @@
   "license": "MIT",
   "dependencies": {
     "awilix": "^12.0.5",
-    "electron-updater": "^6.3.9",
-    "eventemitter3": "^5.0.1",
+    "electron-updater": "^6.7.3",
+    "eventemitter3": "^5.0.4",
     "joi": "^18.0.2",
     "usb-detection": "^4.14.2",
     "winston": "^3.19.0"
